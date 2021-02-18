@@ -1,38 +1,61 @@
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 import { createStackNavigator } from '@react-navigation/stack';
 import * as React from 'react';
 
+import { Feather  } from '@expo/vector-icons'; 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
-import TabOneScreen from '../screens/TabOneScreen';
+import ChatsSceen from '../screens/ChatsSceen';
 import TabTwoScreen from '../screens/TabTwoScreen';
-import { BottomTabParamList, TabOneParamList, TabTwoParamList } from '../types';
+import { MainTabParamList, TabOneParamList, TabTwoParamList } from '../types';
 
-const BottomTab = createBottomTabNavigator<BottomTabParamList>();
+const MainTab = createMaterialTopTabNavigator<MainTabParamList>();
 
-export default function BottomTabNavigator() {
+export default function MainTabNavigator() {
   const colorScheme = useColorScheme();
 
   return (
-    <BottomTab.Navigator
-      initialRouteName="TabOne"
-      tabBarOptions={{ activeTintColor: Colors[colorScheme].tint }}>
-      <BottomTab.Screen
-        name="TabOne"
+    <MainTab.Navigator
+      initialRouteName="Chats"
+      tabBarOptions={{ 
+        activeTintColor: Colors[colorScheme].background,
+        style:{
+          backgroundColor:Colors[colorScheme].tint,
+        }   ,
+        indicatorStyle:{
+          backgroundColor:Colors[colorScheme].background,
+          height:3,
+        },
+        labelStyle:{
+          fontWeight:'bold'
+        } 
+        }}>
+      <MainTab.Screen
+        name="Camera"
         component={TabOneNavigator}
         options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
+          tabBarLabel:()=><Feather name="camera" size={20} color="white" />,
         }}
       />
-      <BottomTab.Screen
-        name="TabTwo"
-        component={TabTwoNavigator}
-        options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
-        }}
+      <MainTab.Screen
+        name="Chats"
+        component={TabOneNavigator}
+    
       />
-    </BottomTab.Navigator>
+
+      <MainTab.Screen
+      name="Status"
+      component={TabOneNavigator}
+   
+      />
+      <MainTab.Screen
+      name="Calls"
+      component={TabOneNavigator}
+   
+      />
+    </MainTab.Navigator>
   );
 }
 
@@ -51,8 +74,8 @@ function TabOneNavigator() {
     <TabOneStack.Navigator>
       <TabOneStack.Screen
         name="TabOneScreen"
-        component={TabOneScreen}
-        options={{ headerTitle: 'Tab One Title' }}
+        component={ChatsSceen}
+       
       />
     </TabOneStack.Navigator>
   );
