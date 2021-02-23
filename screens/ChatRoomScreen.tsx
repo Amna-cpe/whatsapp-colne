@@ -7,23 +7,42 @@ import bg from '../assets/images/BG.png'
 import ChatInput from '../components/ChatInput'
 import { Auth, API, graphqlOperation } from "aws-amplify"
 import { messagesByChatRoomId } from '../src/graphql/queries'
+import { onCreateMessage } from '../src/graphql/subscriptions'
+
 function ChatRoomScreen() {
     const [chatRoomMessages, setChatRoomMessages] = useState([])
     const route = useRoute()
-console.log(route.params)
+
     useEffect(() => {
         const fetch = async () => {
             const msgs = await API.graphql(graphqlOperation(
                 messagesByChatRoomId, {
                 chatRoomId: route.params.id,
-                sortDirection: "DESC"
             }
             ))
-           
+
             setChatRoomMessages(msgs.data.messagesByChatRoomId.items)
         }
         fetch()
     }, [])
+
+    useEffect(() => {
+        const SubToMsgsChange = API.graphql(graphqlOperation(onCreateMessage))
+            .subscribe({
+                next: (data) => {
+                    console.log('lookin for new msgs')
+                    const newMessage = data.value.data.onCreateMessage
+                    if (newMessage.chatRoomId === route.params.id) {
+                        setChatRoomMessages(prevMessages => [...prevMessages, newMessage])
+                    }
+                }
+            })
+
+        return () => SubToMsgsChange.unsubscribe()
+
+    }, [])
+
+
 
 
 
