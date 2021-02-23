@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { View, Text, Image, TouchableWithoutFeedback } from 'react-native'
 import { User } from '../../types'
 import styles from './styles'
@@ -14,12 +14,18 @@ export type ContsctItemProps = {
 const ContactListItem = (props: ContsctItemProps) => {
     const { user } = props
     const navigation = useNavigation()
-    
+    const [authUserID, setauthUserID] = useState('')
+
     const goToChatRoom = async () => {
         try {
             // create chat room
-            const newRoom = await API.graphql(graphqlOperation(createChatRoom, { input: {} }));
+            const newRoom = await API.graphql(graphqlOperation(createChatRoom, {
+                input: {
+                    lastMessageId: "zz753fca-e8c3-473b-8e85-b14196e84e16"
+                }
+            }));
             const roomId = newRoom.data.createChatRoom.id
+            
             // add the other user
             if (newRoom.data.createChatRoom) {
 
@@ -32,6 +38,7 @@ const ContactListItem = (props: ContsctItemProps) => {
             }
             // add the auth user
             const authUser = await Auth.currentAuthenticatedUser({ bypassCache: true })
+            setauthUserID(authUser.attributes.sub)
             await API.graphql(graphqlOperation(createChatRoomUser, {
                 input: {
                     userId: authUser.attributes.sub,
@@ -39,7 +46,7 @@ const ContactListItem = (props: ContsctItemProps) => {
                 }
             }))
 
-            navigation.navigate('ChatRoom', { id: roomId, name: 'amna' })
+            navigation.navigate('ChatRoom', { id: roomId, name: 'amna', userId: authUserID })
         } catch (error) {
             console.log(error)
         }

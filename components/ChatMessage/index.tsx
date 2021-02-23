@@ -5,15 +5,16 @@ import moment from 'moment'
 import styles from './styles'
 
 export type ChatRoomProps = {
-    chatRoomMessage: Message
+    chatRoomMessage: Message,
+    userId:String
 }
 
 
 
 function ChatMessage(props: ChatRoomProps) {
 
-    const { chatRoomMessage } = props
-    const isMyMsg = chatRoomMessage.user.id === 'u1'
+    const { chatRoomMessage , userId } = props
+    const isMyMsg = chatRoomMessage.user.id === userId
 
     return (
         <View  >

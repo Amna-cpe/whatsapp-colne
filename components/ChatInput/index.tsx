@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, TextInput, TouchableOpacity } from 'react-native'
 import styles from './styles'
 import {
@@ -8,18 +8,65 @@ import {
     MaterialCommunityIcons, MaterialIcons,
 } from '@expo/vector-icons';
 
-function ChatInput() {
+import { API, Auth, graphqlOperation } from "aws-amplify"
+import { createMessage, updateChatRoom } from "../../src/graphql/mutations"
+
+function ChatInput(props) {
+    const { roomId } = props
+
     const [message, setMessage] = useState('');
+    const [myId, setMyId] = useState('');
 
-   const  onMicrophonePress = ()=>{
-       console.warn("pressed mic")
-   }
+    useEffect(() => {
+        const fetchTheUser = async () => {
+            const user = await Auth.currentAuthenticatedUser()
+            setMyId(user.attributes.sub)
+        }
+        fetchTheUser()
+    }, [])
 
-   const onSendPress = ()=>{
-       console.warn('press sending')
-       setMessage('')
-   }
- 
+    const onMicrophonePress = () => {
+        console.warn("pressed mic")
+    }
+    const updateLastMsg = async (messageId) => {
+
+        try {
+            await API.graphql(graphqlOperation(updateChatRoom, {
+                input: {
+                    id: roomId,
+                    lastMessageId: messageId,
+                }
+            }
+            ))
+
+        } catch (error) {
+            console.log(error)
+        }
+
+    }
+
+    const onSendPress = async () => {
+
+        //send the message then update the last message on the db
+        try {
+            const msg = await API.graphql(graphqlOperation(createMessage, {
+                input: {
+                    content: message,
+                    userId: myId,
+                    chatRoomId: roomId
+
+                }
+            }))
+            await updateLastMsg(msg.data.createMessage.id)
+
+            setMessage('')
+
+        } catch (error) {
+            console.log(error)
+        }
+
+    }
+
     const onPress = () => {
         if (!message) {
             onMicrophonePress();

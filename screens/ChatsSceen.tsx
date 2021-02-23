@@ -19,7 +19,7 @@ export default function ChatsSceen() {
         const AuthUser = await Auth.currentAuthenticatedUser()
         const userInfo = await API.graphql(graphqlOperation(getUser, { id: AuthUser.attributes.sub }))
         setChatRooms(userInfo.data.getUser.chatRoomUser.items)
-        console.log(userInfo)
+     
       } catch (error) {
         console.log(error)
       }
@@ -32,9 +32,10 @@ export default function ChatsSceen() {
 
 
   }, [])
+  console.log(chatRooms.length)
 
   return (
-    <View >
+    <View style={{position:'relative',height:'100%',width:'100%'}}>
       <FlatList
         data={chatRooms}
         renderItem={({ item }) => <ChatListItem chatRoom={item.chatRoom} />}

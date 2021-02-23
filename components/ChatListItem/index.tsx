@@ -1,4 +1,4 @@
-import React , {useEffect , useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, Text, Image, TouchableWithoutFeedback } from 'react-native'
 import { ChatRoom } from '../../types'
 import styles from './styles'
@@ -12,32 +12,33 @@ export type ChatRoomProps = {
 
 const ChatListItem = (props: ChatRoomProps) => {
     const { chatRoom } = props
-    const [ otherUser, setOtherUser] = useState(null);
+    const [otherUser, setOtherUser] = useState(null);
+    const [authUserId , setAuthUserId] = useState(null)
 
-    // const user = chatRoom.chatRoomUsers.item[0].user;
-    // console.log("the user is ", user)
+
 
     const navigation = useNavigation()
 
     useEffect(() => {
         const getOtherUser = async () => {
-          const userInfo = await Auth.currentAuthenticatedUser();
-          if (chatRoom.chatRoomUsers.items[0].user.id === userInfo.attributes.sub) {
-            setOtherUser(chatRoom.chatRoomUsers.items[1].user);
-          } else {
-            setOtherUser(chatRoom.chatRoomUsers.items[0].user);
-          }
+            const userInfo = await Auth.currentAuthenticatedUser();
+            setAuthUserId( userInfo.attributes.sub)
+            if (chatRoom.chatRoomUsers.items[0].user.id === userInfo.attributes.sub) {
+                setOtherUser(chatRoom.chatRoomUsers.items[1].user);
+            } else {
+                setOtherUser(chatRoom.chatRoomUsers.items[0].user);
+            }
         }
         getOtherUser();
-      }, [])
+    }, [])
 
     const goToChatRoom = () => {
-        navigation.navigate('ChatRoom', { id: chatRoom.id, name: otherUser.name })
+        navigation.navigate('ChatRoom', { id: chatRoom.id, name: otherUser.name, userId: authUserId })
     }
 
     if (!otherUser) {
         return null;
-      }
+    }
 
     return (
         <TouchableWithoutFeedback onPress={goToChatRoom}>
@@ -48,12 +49,12 @@ const ChatListItem = (props: ChatRoomProps) => {
                     </View>
                     <View style={styles.middleMsg}>
                         <Text style={styles.username}>{otherUser.name}</Text>
-                        {/* <Text> {chatRoom.lastMessage.content}</Text> */}
+                        <Text> {chatRoom.lastMessage?.content}</Text>
                     </View>
                 </View>
 
                 <View >
-                    {/* <Text style={styles.time}>{moment(chatRoom.lastMessage.createdAt).format('DD/MM/YY')}</Text> */}
+                    <Text style={styles.time}>{moment(chatRoom.lastMessage?.createdAt).format('DD/MM/YY')}</Text>
                 </View>
 
             </View>

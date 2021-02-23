@@ -18,7 +18,7 @@ export default function ChatsSceen() {
     const fetchUsers = async () => {
       try {
         const usersData = await API.graphql(graphqlOperation(listUsers))
-      
+
         setUsers(usersData.data.listUsers.items)
 
       } catch (error) {
@@ -47,7 +47,7 @@ export default function ChatsSceen() {
           }}
         />}
       />
-    
+
 
     </View>
   );
